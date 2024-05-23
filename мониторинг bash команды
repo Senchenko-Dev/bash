@@ -1,0 +1,7 @@
+RABBITMQ_CHECK: echo "$(count=$(rabbitmqctl cluster_status --formatter=json | jq -r .running_nodes[] | wc -l); if (( count < $(objectForChecking) )); then echo "Ошибка,в кластере RabbitMQ кол-во нод count"; else echo "status ok"; fi)"
+FIND_FILES_DIR: echo "$(count=$(find /var/www/storage/bulk -maxdepth 1 -type f | wc -l); if (( count > $(objectForChecking) )); then echo "Ошибка,в папке bulk файлов больше 10"; else echo "в папке до 10 файлов"; fi)"
+RAM_HIGH_PROCESS: echo "$(ram_usage=$(free -t | awk 'NR == 2 {print int(100-($7/$2*100))}'); if (( ram_usage > $(objectForChecking) )); then echo "Обнаружена высокая нагрузка на RAM. Текущее значение -> $ram_usage%. Топ-процесс по потреблению -> $(ps -eo cmd --no-headers --sort=-%mem | head -n 1 )"; else echo "нагрузка в норме"; fi)"
+CPU_HIGH_PROCESS: echo "$(cpu_usage="$[100-$(top -b -n 1| grep Cpu | awk -F "," '{print $4}' | awk -F "id" '{print $1}' | awk -F "%" '{print int($1)}')]"; if (( cpu_usage > $(objectForChecking) )); then echo "Обнаружена высокая нагрузка на CPU. Текущее значение -> $cpu_usage%. Топ-процесс по потреблению -> $(ps -eo cmd --no-headers --sort=-%cpu | head -n 1 )";  else echo "нагрузка в норме"; fi)"
+CPU_Utilization: echo "$[100-$(top -b -n 1| grep Cpu | awk -F "," '{print $4}' | awk -F "id" '{print $1}' | awk -F "%" '{print int($1)}')]"
+RAM_Utilization: echo "$(free -t | awk 'NR == 2 {print  int(100-($7/$2*100))}')"
+DIR_Usage_Space: echo "$(df -Ph $(objectForChecking) | awk 'NR == 2 {print $5}' | awk -F "%" '{print $1}')"
