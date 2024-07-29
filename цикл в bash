@@ -1,0 +1,18 @@
+#!/bin/bash
+
+folders=("am" "ds" "ophub" "vs")
+
+file_name=("am.yml" "ds.yml" "oh.yml" "vs.yml")
+
+for ((i=0; i<${#folders[@]}; i++)) # ${#folders[@]} <--находит длинну массива folders как len в python
+do
+    folder="${folders[i]}"
+    file="${folder}/${file_name[i]}"
+
+    if [ -f "$file" ]; then
+        echo "Deploying stack from $file"
+        docker stack deploy -c "$file" operhubStack
+    else
+        echo "File $file not found"
+    fi
+done
