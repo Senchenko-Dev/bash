@@ -1,10 +1,9 @@
 #!/bin/bash
 
-START_LINE=92
 SUDOERS_FILE="/etc/sudoers"
 USER_FILE="users.txt"
 
-while IFS= read -r user; do #IFS= перед read позволяет считывать строки целиком, включая пробелы, без их разделения
+while IFS= read -r user; do  #IFS= перед read позволяет считывать строки целиком, включая пробелы, без их разделения
     useradd -m -d /home/$user $user
     echo "Пользователь $user создан."
 done < "$USER_FILE" #Этот оператор перенаправляет содержимое файла, указанного в переменной USER_FILE, в стандартный ввод команды read
@@ -15,15 +14,21 @@ while IFS= read -r pass; do
 done < "$USER_FILE"
 
 while IFS= read -r user; do
-    while true; do
-        if ! sudo sed -n "${START_LINE}p" ${SUDOERS_FILE} | grep -q .; then # Проверяем, есть ли текст в строке
-            sudo sed -i "${START_LINE}i $user ALL=(ALL:ALL) ALL" ${SUDOERS_FILE}
-            echo "Пользователь $user добавлен в файл sudoers."
-            break
-        else
-            START_LINE=$((START_LINE + 1))
-        fi
-    done
+    ROOT_LINE=$(sudo grep -n "^root" ${SUDOERS_FILE} | cut -d: -f1)
+    if [ -n "$ROOT_LINE" ]; then # оператор -n используется для проверки, является ли строка непустой
+        NEXT_LINE=$((ROOT_LINE + 1))
+        while true; do
+            NEXT_CONTENT=$(sudo sed -n "${NEXT_LINE}p" ${SUDOERS_FILE})  # Получаем содержимое следующей строки
+
+            if [ -z "$NEXT_CONTENT" ]; then # Если следующая строка пустая, добавляем пользователя
+                sudo sed -i "${NEXT_LINE}i $user ALL=(ALL:ALL) ALL" ${SUDOERS_FILE}
+                echo "Пользователь $user добавлен в файл sudoers."
+                break
+            else
+                NEXT_LINE=$((NEXT_LINE + 1))
+            fi
+        done
+    else
+        echo "Строка с 'root' не найдена в файле sudoers."
+    fi
 done < "$USER_FILE"
-
-
