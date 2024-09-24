@@ -38,7 +38,7 @@ done
 
 for deb in "${links[@]}"
 do
-  sudo dpkg -i "${deb##*/}"  # Извлекаем имя файла из полного пути
+  sudo dpkg -i "${deb##*/}"  # # <--- deb##*/ удаляет все символы до последнего символа /, включая сам /.  Тоесть до eCashier7.deb
 done
 
 sudo apt-get install -f
