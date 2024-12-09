@@ -29,3 +29,8 @@ for folder in "${folders[@]}"; do
 
     cd "$current_dir" || exit
 done
+
+for service in $(docker service ls | grep _migrate); do
+    echo "Удаляем сервис: $service"
+    docker service rm "$service"
+done
