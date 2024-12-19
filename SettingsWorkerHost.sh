@@ -7,8 +7,6 @@ systemctl enable --now docker
 
 cd /etc/docker && curl -O http://10.7.88.6/share/python_autoinstall/certs.d.tar.gz && tar -xvf certs.d.tar.gz && rm -rf certs.d.tar.gz
 
-echo '194.1.156.16 repohub.ekassir.com' | sudo tee -a /etc/hosts > /dev/null
-
 echo '{
   "log-level": "warn",
   "log-driver": "json-file",
