@@ -2,7 +2,7 @@
 
 echo '194.1.156.16 repohub.ekassir.com' | sudo tee -a /etc/hosts > /dev/null
 
-sudo apt-get install -y docker-engine && sudo usermod -aG docker $USER
+sudo apt-get install -y docker-engine 
 systemctl enable --now docker
 
 cd /etc/docker && curl -O http://10.7.88.6/share/python_autoinstall/certs.d.tar.gz && tar -xvf certs.d.tar.gz && rm -rf certs.d.tar.gz
